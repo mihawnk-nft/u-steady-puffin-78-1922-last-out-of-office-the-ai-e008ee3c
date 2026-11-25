@@ -31,6 +31,14 @@ def main() -> None:
     path = os.path.join(out_dir, "entry.txt")
     with open(path, "w", encoding="utf-8", newline="") as f:
         f.write(ENTRY)
+    # Read back and verify: a partial or recoded write must fail loudly
+    # rather than ship a truncated or altered line to the judge.
+    with open(path, "rb") as f:
+        written = f.read()
+    if written.decode("utf-8") != ENTRY:
+        raise SystemExit("entry.txt does not round-trip to the entry text")
+    if not (1 <= len(written.decode("utf-8")) <= 280):
+        raise SystemExit("entry.txt is outside the 1-280 character gate")
 
 
 if __name__ == "__main__":
